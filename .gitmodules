@@ -1,0 +1,3 @@
+[submodule "submodules/pathfs"]
+	path = submodules/pathfs
+	url = https://github.com/jiwonz/lune-path-fs.git
