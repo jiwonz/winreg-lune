@@ -1,3 +1,6 @@
 [submodule "submodules/pathfs"]
 	path = submodules/pathfs
 	url = https://github.com/jiwonz/lune-path-fs.git
+[submodule "submodules/RegExp"]
+	path = submodules/RegExp
+	url = https://github.com/jiwonz/luau-regexp.git

@@ -11,7 +11,7 @@ Example code
 ```luau
 local hkcu = winreg.RegKey.predef("HKEY_CURRENT_USER")
 
-local robloxStudioReg = hkcu:openSubkey("Software\\Roblox\\RobloxStudio"):mapErr("Failed to open Roblox Studio registry")
+local robloxStudioReg = hkcu:openSubkey("Software\\Roblox\\RobloxStudio")
 
 ```
 
