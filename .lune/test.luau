@@ -11,8 +11,18 @@ local hkcu = winreg.RegKey.predef("HKEY_CURRENT_USER")
 
 local software = hkcu:openSubkey("Software")
 
-print("before:", software:getValue("jiwonz"))
+-- print("before:", software:getValue("jiwonz"))
+-- local b0 = software:getValue("jiwonz")
+-- print("read uint8:", buffer.readu8(b0, 0))
 
-software:setValue("jiwonz", 123456)
+-- local b = buffer.create(1)
+-- buffer.writeu8(b, 0, 255)
+-- software:setRawValue("jiwonz", {
+-- 	vtype = "REG_BINARY",
+-- 	bytes = b
+-- })
 
-print("after:", software:getRawValue("jiwonz"))
+-- print("after:", software:getRawValue("jiwonz"))
+
+print(software:getValues())
+print(software:getKeys())
