@@ -61,7 +61,7 @@ function winreg.getRegProgram()
 	return "REG"
 end
 
-function winreg.exist(path: string)
+function winreg.exists(path: string)
 	local result = process.spawn(winreg.getRegProgram(), { "QUERY", path, "/ve" })
 	if result.ok then
 		return true
@@ -139,6 +139,10 @@ function winreg.toRawBytes(bytes: string | buffer): string
 	return bytes
 end
 
+function winreg.testKey(key: string)
+	return KEY_PATTERN:test(key)
+end
+
 export type RegKey = typeof(setmetatable(
 	{} :: {
 		hkey: string
@@ -201,7 +205,7 @@ type RegKeyImpl = {
 	--[=[
 		Create this registry key. Open a subkey if the key already exists.
 	]=]
-	createSubkey: (self: RegKey, path: string) -> (),
+	createSubkey: (self: RegKey, path: string) -> (RegKey),
 	--[=[
 		Join subkey path into current hkey path
 	]=]
@@ -239,10 +243,6 @@ type RegKeyImpl = {
 	]=]
 	copySubkey: (self: RegKey, path: string, dest: string) -> (),
 	--[=[
-		Clone this RegKey into `dest` and open the clone.
-	]=]
-	clone: (self: RegKey, dest: string) -> (),
-	--[=[
 		Delete this RegKey and its all subkeys.
 	]=]
 	destroy: (self: RegKey) -> (),
@@ -257,7 +257,11 @@ type RegKeyImpl = {
 
 		unlike `getRawValue()`, does not raise an error if value was not found.
 	]=]
-	findFirstRawValue: (self: RegKey, name: Name) -> (RegValue?)
+	findFirstRawValue: (self: RegKey, name: Name) -> (RegValue?),
+	--[=[
+		Copy all the values and subkeys from `path` to `target` key.
+	]=]
+	copyTree: (self: RegKey, path: string, target: RegKey) -> ()
 }
 
 local RegKey = {} :: RegKeyImpl
@@ -268,7 +272,7 @@ local function trim(str: string): string
 end
 
 function RegKey.predef(hkey)
-	if not winreg.exist(hkey) then
+	if not winreg.exists(hkey) then
 		error(`'{hkey}' is not a valid HKEY`)
 	end
 	return setmetatable({
@@ -278,7 +282,7 @@ end
 
 function RegKey.openSubkey(self, path)
 	local fullpath = self:joinSubkey(path)
-	local exist = winreg.exist(fullpath)
+	local exist = winreg.exists(fullpath)
 	if exist then
 		return setmetatable({
 			hkey = fullpath
@@ -509,6 +513,87 @@ function RegKey.updateRawValue(self, name, regValue)
 		self:setRawValue(name, regValue)
 	else
 		error(`Could not update value. Cannot assign '{regValue.vtype}' into '{oldRegValue.vtype}'`)
+	end
+end
+
+function RegKey.renameSubkey(self, path, newPath)
+	self:copySubkey(path, newPath)
+	self:deleteSubkey(path)
+end
+
+function RegKey.copySubkey(self, path, dest)
+	local fullpath = self:joinSubkey(path)
+	local destFullpath = self:joinSubkey(dest)
+	local params: {string} = { "COPY", self.hkey }
+	table.insert(params, fullpath)
+	table.insert(params, destFullpath)
+	table.insert(params, "/s")
+	table.insert(params, "/f")
+	local result = process.spawn(winreg.getRegProgram(), params)
+	if not result.ok then
+		error(`Failed to copy {fullpath} into {destFullpath} (reason: {result.stderr})`)
+	end
+end
+
+function RegKey.destroy(self)
+	local params = { "DELETE", self.hkey, "/f" }
+	local result = process.spawn(winreg.getRegProgram(), params)
+	if not result.ok then
+		error(`Failed to destroy this RegKey({self.hkey}) (reason: {result.stderr})`)
+	end
+end
+
+function RegKey.findFirstValue(self, name)
+	local item = self:findFirstRawValue(name)
+	if not item then
+		return
+	end
+	return winreg.parse(item.vtype :: any, winreg.toRawBytes(item.bytes))
+end
+
+function RegKey.findFirstRawValue(self, name)
+	local params = { "QUERY", self.hkey }
+	if not name or name == "" then
+		table.insert(params, "/ve")
+	else
+		table.insert(params, "/v")
+		table.insert(params, name)
+	end
+	local result = process.spawn(winreg.getRegProgram(), params)
+	if result.ok then
+		local items = {}
+		local lines = result.stdout:split('\r\n')
+
+		for i, line in lines do
+			line = trim(line);
+			if #line > 1 then
+				if i ~= 1 then
+					table.insert(items, line)
+				end
+			end
+		end
+
+		local item = items[#items] or ""
+		local match = ITEM_PATTERN:exec(item)
+
+		if match then
+			local type = trim(match[3])
+			local value: string = match[4]
+			return {
+				vtype = type :: any,
+				bytes = value
+			}
+		end
+	end
+	return
+end
+
+function RegKey.copyTree(self, path, target)
+	local fullpath = self:joinSubkey(path)
+	local params = { "COPY", fullpath, target.hkey, "/s", "/f" }
+	local result = process.spawn(winreg.getRegProgram(), params)
+	if not result.ok then
+		error(`Failed to copy tree of path({fullpath}) into target({target.hkey}) (reason: {result.stderr})`)
 	end
 end
 
