@@ -8,6 +8,6 @@ local contentFolderValue: string = robloxStudioReg:getValue("ContentFolder")
 
 local robloxPlayerReg = hkcu:openSubkey("Software\\ROBLOX Corporation\\Environments\\roblox-player")
 
-local clientExeValue = robloxPlayerReg:getValue("clientExe")
+local clientExeValue: string = robloxPlayerReg:getValue("clientExe")
 
 print(`Roblox Studio content folder path: {contentFolderValue}\nRoblox Player exe path: {clientExeValue}`)
