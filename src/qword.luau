@@ -110,7 +110,7 @@ end
 return function(hexOrDec: string): QWORD
 	local numberFormat = detectNumberFormat(hexOrDec)
 	if numberFormat == "unknown" then
-		error(`QWORD must be a string-typed number, god {hexOrDec}`)
+		error(`QWORD must be a string-typed number, got {hexOrDec}`)
 	elseif numberFormat == "hexadecimal" then
 		hexOrDec = hexToDecimal(hexOrDec)
 	end
