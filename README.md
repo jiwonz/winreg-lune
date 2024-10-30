@@ -1,4 +1,4 @@
-# winreg-lune (WIP)
+# winreg-lune
 A lune module that provides access to the Windows Registry through the REG commandline tool
 
 ## Usage

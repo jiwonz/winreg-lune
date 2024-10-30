@@ -1,0 +1,39 @@
+name = "jiwonz/winreg"
+version = "0.1.0"
+target = "lune"
+
+[graph."jiwonz/luau_regexp"."0.1.0 luau"]
+direct = ["luau_regexp", { name = "jiwonz/luau_regexp", version = "^0.1.0", target = "luau" }]
+ty = "standard"
+
+[graph."jiwonz/luau_regexp"."0.1.0 luau".target]
+environment = "luau"
+lib = "src/Regexp.global.luau"
+
+[graph."jiwonz/luau_regexp"."0.1.0 luau".pkg_ref]
+ref_ty = "pesde"
+name = "jiwonz/luau_regexp"
+version = "0.1.0"
+index_url = "https://github.com/daimond113/pesde-index"
+
+[graph."jiwonz/luau_regexp"."0.1.0 luau".pkg_ref.target]
+environment = "luau"
+lib = "src/Regexp.global.luau"
+
+[graph."jiwonz/pathfs"."0.1.0 lune"]
+direct = ["pathfs", { name = "jiwonz/pathfs", version = "^0.1.0" }]
+ty = "standard"
+
+[graph."jiwonz/pathfs"."0.1.0 lune".target]
+environment = "lune"
+lib = "init.luau"
+
+[graph."jiwonz/pathfs"."0.1.0 lune".pkg_ref]
+ref_ty = "pesde"
+name = "jiwonz/pathfs"
+version = "0.1.0"
+index_url = "https://github.com/daimond113/pesde-index"
+
+[graph."jiwonz/pathfs"."0.1.0 lune".pkg_ref.target]
+environment = "lune"
+lib = "init.luau"

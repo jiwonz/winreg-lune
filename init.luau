@@ -1,8 +1,8 @@
 --!strict
 
 local process = require("@lune/process")
-local pathfs = require("submodules/pathfs")
-local RegExp = require("submodules/RegExp")
+local pathfs = require("lune_packages/pathfs")
+local RegExp = require("luau_packages/luau_regexp")
 local qword = require("src/qword")
 local binaryUtil = require("src/binaryUtil")
 local winreg = {}
