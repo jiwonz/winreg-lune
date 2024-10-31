@@ -2,9 +2,9 @@
 A lune module that provides access to the Windows Registry through the REG commandline tool
 
 ## Usage
-Install with git submodule
+Install with pesde
 ```sh
-git submodule add [url] [path/to/submodule]
+pesde add jiwonz/winreg
 ```
 
 Example code
