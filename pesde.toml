@@ -4,7 +4,7 @@ description = "A lune module that provides access to the Windows Registry throug
 authors = ["jiwonz"]
 repository = "https://github.com/jiwonz/winreg-lune"
 license = "MIT"
-includes = ["init.luau", "pesde.toml", "README.md", "src"]
+includes = ["init.luau", "pesde.toml", "README.md", "src", "LICENSE.md"]
 
 [target]
 environment = "lune"
